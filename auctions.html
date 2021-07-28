@@ -2,10 +2,38 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.countdown/2.2.0/jquery.countdown.min.js" integrity="sha512-lteuRD+aUENrZPTXWFRPTBcDDxIGWe5uu0apPEn+3ZKYDwDaEErIK9rvR0QzUGmUQ55KFE2RqGTVoZsKctGMVw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="auctions.js"></script>
+
+    <style>
+        .clickable {
+            cursor: pointer;
+        }
+    </style>
+
     <title>Auctions</title>
 </head>
 <body>
+<div id="auctions" style="visibility: hidden"></div>
+
+<div id="lots" style="visibility: hidden">
+    <table class="table table-bordered table-hover table-responsive">
+        <thead>
+            <tr>
+                <th scope="col" class="col-1">#</th>
+                <th scope="col" class="col-3">Picture</th>
+                <th scope="col" class="col-4">Title</th>
+                <th scope="col" class="col-1">Bid</th>
+                <th scope="col" class="col-1">Time</th>
+            </tr>
+        </thead>
+        <tbody id="lots-table-body">
+        </tbody>
+    </table>
+</div>
 </body>
 </html>
