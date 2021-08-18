@@ -106,7 +106,6 @@ function loadLotsPage(page, autoContinue) {
                     "
                 )
 
-            console.log(lotEntry.html())
             $("#lots-table-body").append(lotEntry)
         })
 
