@@ -5,6 +5,11 @@ window.onload = function () {
     } else {
         console.log("Loading lots...")
         loadLots()
+
+        window.setInterval(function(){
+            console.log("Reloading lots...")
+            loadLots()
+        }, 15000);
     }
 }
 
@@ -44,69 +49,14 @@ function loadLotsPage(page, autoContinue) {
         // loop over all lots entries
         let lots = lotsTable.querySelectorAll("tr:not(:first-child)")
         lots.forEach(lot => {
-            let lotEntry = $("<tr class='clickable'></tr>")
+            let lotEntry = parseLot(lot)
+            let existingLotEntry = $("#" + lotEntry.attr("id"))
 
-            // lot link
-            let lotLink = lot.querySelector("td:nth-child(1) > a").getAttribute("href")
-            lotEntry.attr("onclick", "window.open('" + lotLink + "')")
-
-            // lot number
-            let lotNumber = lot.querySelector("td:nth-child(1) > a > h5").textContent
-            lotEntry.append("<th scope='row'><h3>" + lotNumber + "</h3></th>")
-
-            // lot preview image
-            let lotImage = lot.querySelector("td:nth-child(2) > a").getAttribute("data-img")
-            lotEntry.append("<td><img src='" + lotImage + "' width=500></td>")
-
-            // lot title
-            let lotTitle = lot.querySelector("td:nth-child(3) > a > h5").textContent.replace(/THIS PRODUCT IS FULLY FUNCTIONAL.*/, "")
-
-            lotEntry.append("<td><h2>" + lotTitle + "</h2></td>")
-
-            // lot bid
-            let lotBid = lot.querySelector("td:nth-child(4) > a > h5").textContent
-            lotEntry.append("<td><h2>" + lotBid + "</h2></td>")
-
-            // lot time left
-            let lotTimeRaw = lot.querySelector("td:nth-child(5) > a:first-child > h5").textContent
-            let lotTime
-            {
-                // easily get the time left of unit from string
-                function getTime(ends, units) {
-                    return ends.substring( ends.substring(0, units).lastIndexOf(' ')+1, units)
-                }
-
-                // parse lot time left
-                lotTime = new Date().getTime()
-                for (let i = 0; i < lotTimeRaw.length; i++) {
-                    switch (lotTimeRaw.charAt(i)) {
-                        case 'd':
-                            lotTime += getTime(lotTimeRaw, i) * 1000 * 60 * 60 * 24
-                            break
-                        case 'h':
-                            lotTime += getTime(lotTimeRaw, i) * 1000 * 60 * 60
-                            break
-                        case 'm':
-                            lotTime += getTime(lotTimeRaw, i) * 1000 * 60
-                            break
-                        case 's':
-                            lotTime += getTime(lotTimeRaw, i) * 1000
-                    }
-                }
+            if (existingLotEntry.length !== 0) {
+                existingLotEntry.replaceWith(lotEntry)
+            } else {
+                $("#lots-table-body").append(lotEntry)
             }
-
-            // append countdown entry, div and script
-            lotEntry.append("<td><h2 id='countdown-" + lotNumber + "'></h2></td>")
-                .append(
-                    "<script>\
-                    $('#countdown-" + lotNumber + "').countdown(" + lotTime + ", function(event) {\
-                        $(this).text(event.strftime('%H:%M:%S'))\
-                    })\
-                    </script>\
-                    "
-                )
-
-            $("#lots-table-body").append(lotEntry)
         })
 
         // automatically continue if should
@@ -120,6 +70,76 @@ function loadLotsPage(page, autoContinue) {
     }).fail(function() {
         console.log("Failed to fetch lots page " + page)
     })
+}
+
+function parseLot(lot) {
+    let lotEntry = $("<tr class='clickable'></tr>")
+
+    // lot link
+    let lotLink = lot.querySelector("td:nth-child(1) > a").getAttribute("href")
+    lotEntry.attr("onclick", "window.open('" + lotLink + "')")
+
+    // lot number
+    let lotNumber = lot.querySelector("td:nth-child(1) > a > h5").textContent
+    lotEntry.append("<th scope='row'><h3>" + lotNumber + "</h3></th>")
+
+    // add lot number as id to lot entry
+    lotEntry.attr("id", "lot-" + lotNumber)
+
+    // lot preview image
+    let lotImage = lot.querySelector("td:nth-child(2) > a").getAttribute("data-img")
+    lotEntry.append("<td><img src='" + lotImage + "' width=500></td>")
+
+    // lot title
+    let lotTitle = lot.querySelector("td:nth-child(3) > a > h5").textContent.replace(/THIS PRODUCT IS FULLY FUNCTIONAL.*/, "")
+
+    lotEntry.append("<td><h2>" + lotTitle + "</h2></td>")
+
+    // lot bid
+    let lotBid = lot.querySelector("td:nth-child(4) > a > h5").textContent
+    lotEntry.append("<td><h2>" + lotBid + "</h2></td>")
+
+    // lot time left
+    let lotTimeRaw = lot.querySelector("td:nth-child(5) > a:first-child > h5").textContent
+    let lotTime
+    {
+        // easily get the time left of unit from string
+        function getTime(ends, units) {
+            return ends.substring( ends.substring(0, units).lastIndexOf(' ')+1, units)
+        }
+
+        // parse lot time left
+        lotTime = new Date().getTime()
+        for (let i = 0; i < lotTimeRaw.length; i++) {
+            switch (lotTimeRaw.charAt(i)) {
+                case 'd':
+                    lotTime += getTime(lotTimeRaw, i) * 1000 * 60 * 60 * 24
+                    break
+                case 'h':
+                    lotTime += getTime(lotTimeRaw, i) * 1000 * 60 * 60
+                    break
+                case 'm':
+                    lotTime += getTime(lotTimeRaw, i) * 1000 * 60
+                    break
+                case 's':
+                    lotTime += getTime(lotTimeRaw, i) * 1000
+            }
+        }
+
+    }
+
+    // append countdown entry, div and script
+    lotEntry.append("<td><h2 id='countdown-" + lotNumber + "'></h2></td>")
+        .append(
+            "<script>\
+            $('#countdown-" + lotNumber + "').countdown(" + lotTime + ", function(event) {\
+                        $(this).text(event.strftime('%H:%M:%S'))\
+                    })\
+                    </script>\
+                    "
+        )
+
+    return lotEntry
 }
 
 function getUrlParameter(sParam) {
