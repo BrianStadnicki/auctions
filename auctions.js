@@ -59,7 +59,8 @@ function loadLotsPage(page, autoContinue) {
             lotEntry.append("<td><img src='" + lotImage + "' width=500></td>")
 
             // lot title
-            let lotTitle = lot.querySelector("td:nth-child(3) > a > h5").textContent
+            let lotTitle = lot.querySelector("td:nth-child(3) > a > h5").textContent.replace(/THIS PRODUCT IS FULLY FUNCTIONAL.*/, "")
+
             lotEntry.append("<td><h2>" + lotTitle + "</h2></td>")
 
             // lot bid
