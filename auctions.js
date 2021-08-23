@@ -73,11 +73,10 @@ function loadLotsPage(page, autoContinue) {
 }
 
 function parseLot(lot) {
-    let lotEntry = $("<tr class='clickable'></tr>")
+    let lotEntry = $("<tr></tr>")
 
     // lot link
     let lotLink = lot.querySelector("td:nth-child(1) > a").getAttribute("href")
-    lotEntry.attr("onclick", "window.open('" + lotLink + "')")
 
     // lot number
     let lotNumber = lot.querySelector("td:nth-child(1) > a > h5").textContent
@@ -93,7 +92,7 @@ function parseLot(lot) {
     // lot title
     let lotTitle = lot.querySelector("td:nth-child(3) > a > h5").textContent.replace(/THIS PRODUCT IS FULLY FUNCTIONAL.*/, "")
 
-    lotEntry.append("<td><h2>" + lotTitle + "</h2></td>")
+    lotEntry.append("<td><a href='" + lotLink + "'><h2>" + lotTitle + "</h2></a></td>")
 
     // lot bid
     let lotBid = lot.querySelector("td:nth-child(4) > a > h5").textContent
@@ -138,6 +137,10 @@ function parseLot(lot) {
                     </script>\
                     "
         )
+
+    for (let i = 1; i < lotEntry.children().length - 1; i++) {
+        lotEntry.eq(i).attr("onclick", "window.open('" + lotLink + "')")
+    }
 
     return lotEntry
 }
