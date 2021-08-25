@@ -34,8 +34,13 @@ function loadAuctions() {
 
 function loadLots() {
     $("#lots").css("visibility", "visible")
-    $("#lots > nav > div > a:nth-child(2)").attr("href", "index.html?" + window.location.search.substring(1).replace("favoured=1", "favoured=0"))
-    $("#lots > nav > div > a:nth-child(3)").attr("href", "index.html?" + window.location.search.substring(1).replace("favoured=0", "favoured=1"))
+    let navLinkAll = $("#lots-nav-link-all").attr("href", getUrlWithParameter(window.location.href, "favoured", 0))
+    let navLinkFavoured = $("#lots-nav-link-favoured").attr("href", getUrlWithParameter(window.location.href, "favoured", 1))
+    if (getUrlParameter("favoured") === "1") {
+        navLinkFavoured.addClass("active")
+    } else {
+        navLinkAll.addClass("active")
+    }
     loadLotsPage(1, true)
 }
 
@@ -196,18 +201,34 @@ function unfavouredLot(lot) {
     }
 }
 
-function getUrlParameter(sParam) {
-    let sPageURL = window.location.search.substring(1),
-        sURLVariables = sPageURL.split('&'),
-        sParameterName,
-        i;
+function getUrlWithParameter(url, parameter, value) {
+    if (url.includes("?" + parameter + "=")) {
+        return url.replace("?" + parameter + "=" + getUrlParameterFromURL(url, parameter), "?" + parameter + "=" + value)
+    } else if (url.includes("&" + parameter + "=")) {
+        return url.replace("&" + parameter + "=" + getUrlParameterFromURL(url, parameter), "&" + parameter + "=" + value)
+    } else if (url.indexOf("?") !== url.length - 1) {
+        return url + "&" + parameter + "=" + value
+    } else if (url.indexOf("?") !== -1) {
+        return url + parameter + "=" + value
+    } else {
+        return url + "?" + parameter + "=" + value
+    }
+}
 
-    for (i = 0; i < sURLVariables.length; i++) {
-        sParameterName = sURLVariables[i].split('=');
+function getUrlParameter(param) {
+    return getUrlParameterFromURL(window.location.href, param)
+}
 
-        if (sParameterName[0] === sParam) {
-            return typeof sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+function getUrlParameterFromURL(url, param) {
+    let urlParams = url.substring(url.indexOf("?") + 1)
+    let urlVariables = urlParams.split("&")
+
+    for (let i = 0; i < urlVariables.length; i++) {
+        let parameterName = urlVariables[i].split("=")
+
+        if (parameterName[0] === param) {
+            return typeof parameterName[1] === undefined ? true : decodeURIComponent(parameterName[1])
         }
     }
-    return false;
+    return false
 }
