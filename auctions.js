@@ -15,7 +15,7 @@ window.onload = function () {
 
 function loadAuctions() {
     $("#auctions").css("visibility", "visible")
-    $.get("https://cors-anywhere.herokuapp.com/https://www.johnpyeauctions.co.uk/index.asp", function (indexData) {
+    $.get("/proxy/auctions.php", function (indexData) {
         // remove link's webpage so added to current's params
         indexData = indexData.replaceAll("auction_details.asp", "")
 
@@ -34,13 +34,13 @@ function loadAuctions() {
 
 function loadLots() {
     $("#lots").css("visibility", "visible")
-    $("#lots > nav > div > a:nth-child(2)").attr("href", "auctions.html?" + window.location.search.substring(1).replace("favoured=1", "favoured=0"))
-    $("#lots > nav > div > a:nth-child(3)").attr("href", "auctions.html?" + window.location.search.substring(1).replace("favoured=0", "favoured=1"))
+    $("#lots > nav > div > a:nth-child(2)").attr("href", "index.html?" + window.location.search.substring(1).replace("favoured=1", "favoured=0"))
+    $("#lots > nav > div > a:nth-child(3)").attr("href", "index.html?" + window.location.search.substring(1).replace("favoured=0", "favoured=1"))
     loadLotsPage(1, true)
 }
 
 function loadLotsPage(page, autoContinue) {
-    return $.get("https://cors-anywhere.herokuapp.com/https://www.johnpyeauctions.co.uk/lot_list.asp?" + window.location.search.substring(1) + "&pageno=" + page, function (lotsData) {
+    return $.get("/proxy/lots.php?saleid=" + getUrlParameter("saleid") + "&pageno=" + page, function (lotsData) {
         // add link's webpage
         lotsData = lotsData.replaceAll("lot_details.asp", "https://www.johnpyeauctions.co.uk/lot_details.asp")
 
