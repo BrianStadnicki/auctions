@@ -152,7 +152,8 @@ function parseLot(lot) {
 
     // lot preview image
     let lotImage = lot.querySelector("td:nth-child(2) > a").getAttribute("data-img")
-    lotEntry.append("<td><img src='" + lotImage + "' style='height:" + rowHeight + "'></td>")
+    lotEntry.append("<td><img src='" + lotImage + "' style='height:" + rowHeight + "' onmouseover='handleLotImageHover(this)' onmouseout='handleLotImageUnHover(this)'></td>")
+    lotEntry.append("<img src='" + lotImage + "' style='display: none' id='lot-" + lotNumber + "-large-image''>")
 
     // lot title
     let lotTitle = lot.querySelector("td:nth-child(3) > a > h5").textContent.replace(/THIS PRODUCT IS FULLY FUNCTIONAL.*/, "")
@@ -232,6 +233,26 @@ function unfavouredLot(lot) {
     if (getUrlParameter("favoured") === "1") {
         $('#lot-' + lot).remove()
     }
+}
+
+function handleLotImageHover(element) {
+    element = $(element)
+    let current = element.parent()
+    while (current.next().length) {
+        current = current.next()
+        current.css("display", "none")
+    }
+    $("#" + element.parent().parent().attr("id") + "-large-image").css("display", "block")
+}
+
+function handleLotImageUnHover(element) {
+    element = $(element)
+    let current = element.parent()
+    while (current.next().length) {
+        current = current.next()
+        if (current.prop("tagName") === "TD") { current.css("display", "table-cell") }
+    }
+    $("#" + element.parent().parent().attr("id") + "-large-image").css("display", "none")
 }
 
 function handleLoadLotsLink(element) {
