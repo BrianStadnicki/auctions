@@ -1,3 +1,5 @@
+let ongoingRequests = []
+
 window.onload = function () {
     if (!getUrlParameter("saleid")) {
         console.log("Loading auctions...")
@@ -6,16 +8,29 @@ window.onload = function () {
         console.log("Loading lots...")
         loadLots()
 
-        window.setInterval(function(){
-            console.log("Reloading lots...")
-            loadLots()
+        window.setInterval(function() {
+            if ($("#lots").attr("display") === "initial") {
+                console.log("Reloading lots...")
+                loadLots()
+            }
         }, 15000);
     }
 }
 
+window.onpopstate = function (event) {
+    cancelAllRequests()
+    if (event.state.page === "auctions") {
+        loadAuctions()
+    } else if (event.state.page === "lots") {
+        loadLots()
+    }
+}
+
 function loadAuctions() {
-    $("#auctions").css("visibility", "visible")
-    $.get("/proxy/auctions.php", function (indexData) {
+    $("#lots").css("display", "none")
+    $("#auctions").css("display", "initial").empty()
+
+    ongoingRequests.push($.get("/proxy/auctions.php", function (indexData) {
         // remove link's webpage so added to current's params
         indexData = indexData.replaceAll("auction_details.asp", "")
 
@@ -27,25 +42,34 @@ function loadAuctions() {
         const auctionsTable = indexDoc.querySelector("body > div.container > div > div:nth-child(3) > table:nth-child(1)")
         auctionsTable.querySelectorAll("a").forEach(function (auctionLink) {
             auctionLink.href = auctionLink.href + "&favoured=0"
+            auctionLink.setAttribute("onclick", "return handleLoadLotsLink(this)")
         })
+
         $("#auctions").append(auctionsTable)
-    })
+    }))
 }
 
 function loadLots() {
-    $("#lots").css("visibility", "visible")
+    $("#lots").css("display", "initial")
+    $("#auctions").css("display", "none").empty()
+    $("#lots-table-body").empty()
+
     let navLinkAll = $("#lots-nav-link-all").attr("href", getUrlWithParameter(window.location.href, "favoured", 0))
     let navLinkFavoured = $("#lots-nav-link-favoured").attr("href", getUrlWithParameter(window.location.href, "favoured", 1))
+
     if (getUrlParameter("favoured") === "1") {
         navLinkFavoured.addClass("active")
+        navLinkAll.removeClass("active")
     } else {
         navLinkAll.addClass("active")
+        navLinkFavoured.removeClass("active")
     }
+
     loadLotsPage(1, true)
 }
 
 function loadLotsPage(page, autoContinue) {
-    return $.get("/proxy/lots.php?saleid=" + getUrlParameter("saleid") + "&pageno=" + page, function (lotsData) {
+    let request = $.get("/proxy/lots.php?saleid=" + getUrlParameter("saleid") + "&pageno=" + page, function (lotsData) {
         // add link's webpage
         lotsData = lotsData.replaceAll("lot_details.asp", "https://www.johnpyeauctions.co.uk/lot_details.asp")
 
@@ -80,6 +104,8 @@ function loadLotsPage(page, autoContinue) {
     }).fail(function() {
         console.log("Failed to fetch lots page " + page)
     })
+    ongoingRequests.push(request)
+    return request
 }
 
 function parseLot(lot) {
@@ -199,6 +225,41 @@ function unfavouredLot(lot) {
     if (getUrlParameter("favoured") === "1") {
         $('#lot-' + lot).remove()
     }
+}
+
+function handleLoadLotsLink(element) {
+    window.history.pushState({page: "lots", scope: "all"}, "Lots", element.getAttribute("href"))
+    cancelAllRequests()
+    loadLots()
+    return false
+}
+
+function handleLoadLotsAllLink(element) {
+    window.history.pushState({page: "lots", scope: "all"}, "All Lots", element.getAttribute("href"))
+    cancelAllRequests()
+    loadLots()
+    return false
+}
+
+function handleLoadLotsFavouredLink(element) {
+    window.history.pushState({page: "lots", scope: "favoured"}, "Favoured Lots", element.getAttribute("href"))
+    cancelAllRequests()
+    loadLots()
+    return false
+}
+
+function handleLoadAuctionsLink(element) {
+    window.history.pushState({page: "auctions"}, "Auctions", element.getAttribute("href"))
+    cancelAllRequests()
+    loadAuctions()
+    return false
+}
+
+function cancelAllRequests() {
+    for (let ongoingRequest of ongoingRequests) {
+        ongoingRequest.abort()
+    }
+    ongoingRequests = []
 }
 
 function getUrlWithParameter(url, parameter, value) {

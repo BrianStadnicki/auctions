@@ -23,18 +23,18 @@
     <title>Auctions</title>
 </head>
 <body>
-<div id="auctions" style="visibility: hidden"></div>
+<div id="auctions" style="display: none"></div>
 
-<div id="lots" style="visibility: hidden">
+<div id="lots" style="display: none">
     <nav class="navbar navbar-expand-md navbar-light bg-light">
         <div class="container-fluid">
-            <a class="nav-link" href="index.html">Auctions</a>
+            <a class="" href="index.html" id="lots-nav-link-auctions" onclick="return handleLoadAuctionsLink(this)">Auctions</a>
         </div>
     </nav>
 
     <ul class="nav nav-tabs">
-        <li class="nav-item"><a class="nav-link" id="lots-nav-link-all">All</a></li>
-        <li class="nav-item"><a class="nav-link" id="lots-nav-link-favoured">Favoured</a></li>
+        <li class="nav-item"><a class="nav-link" id="lots-nav-link-all" onclick="return handleLoadLotsAllLink(this)">All</a></li>
+        <li class="nav-item"><a class="nav-link" id="lots-nav-link-favoured" onclick="return handleLoadLotsFavouredLink(this)">Favoured</a></li>
     </ul>
 
     <table class="table table-bordered table-hover table-responsive">
