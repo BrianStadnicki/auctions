@@ -113,9 +113,17 @@ function loadLotsPage(page, autoContinue) {
 
 function parseLot(lot) {
     let rowHeight = "50vh" // default to large
-    if (getUrlParameter("spacing") === "2") {
+    let rowHeightSpecified
+
+    if (getUrlParameter("spacing")) {
+        rowHeightSpecified = getUrlParameter("spacing")
+    } else if (window.localStorage.getItem("spacing")) {
+        rowHeightSpecified = JSON.parse(window.localStorage.getItem("spacing")).spacing
+    }
+
+    if (rowHeightSpecified === "2") {
         rowHeight = "30vh"
-    } else if (getUrlParameter("spacing") === "1") {
+    } else if (rowHeightSpecified === "1") {
         rowHeight = "20vh"
     }
 
