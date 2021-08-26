@@ -71,7 +71,7 @@ function loadLots() {
 function loadLotsPage(page, autoContinue) {
     let request = $.get("/proxy/lots.php?saleid=" + getUrlParameter("saleid") + "&pageno=" + page, function (lotsData) {
         // add link's webpage
-        lotsData = lotsData.replaceAll("lot_details.asp", "https://www.johnpyeauctions.co.uk/lot_details.asp")
+        lotsData = lotsData.replaceAll("lot_details.asp", "https://www.johnpyeauctions.co.uk/lot_details.asp").replaceAll("�", "£")
 
         // parse lots page
         const lotsParser = new DOMParser()
