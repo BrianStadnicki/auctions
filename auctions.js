@@ -109,7 +109,14 @@ function loadLotsPage(page, autoContinue) {
 }
 
 function parseLot(lot) {
-    let lotEntry = $("<tr></tr>")
+    let rowHeight = "50vh" // default to large
+    if (getUrlParameter("spacing") === "2") {
+        rowHeight = "30vh"
+    } else if (getUrlParameter("spacing") === "1") {
+        rowHeight = "20vh"
+    }
+
+    let lotEntry = $("<tr style='height:" + rowHeight + ";'></tr>")
 
     // lot link
     let lotLink = lot.querySelector("td:nth-child(1) > a").getAttribute("href")
@@ -145,7 +152,7 @@ function parseLot(lot) {
 
     // lot preview image
     let lotImage = lot.querySelector("td:nth-child(2) > a").getAttribute("data-img")
-    lotEntry.append("<td><img src='" + lotImage + "' width=500></td>")
+    lotEntry.append("<td><img src='" + lotImage + "' style='height:" + rowHeight + "'></td>")
 
     // lot title
     let lotTitle = lot.querySelector("td:nth-child(3) > a > h5").textContent.replace(/THIS PRODUCT IS FULLY FUNCTIONAL.*/, "")
@@ -252,6 +259,13 @@ function handleLoadAuctionsLink(element) {
     window.history.pushState({page: "auctions"}, "Auctions", element.getAttribute("href"))
     cancelAllRequests()
     loadAuctions()
+    return false
+}
+
+function handleLoadLotsSpacingLink(element, spacing) {
+    window.history.pushState({page: "lots", scope: getUrlParameter("favoured") === "1" ? "all" : "favoured", spacing: spacing }, "Lots", getUrlWithParameter(window.location.href, "spacing", spacing))
+    cancelAllRequests()
+    loadLots()
     return false
 }
 
