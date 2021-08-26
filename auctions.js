@@ -41,7 +41,10 @@ function loadAuctions() {
         // get auctions table and show
         const auctionsTable = indexDoc.querySelector("body > div.container > div > div:nth-child(3) > table:nth-child(1)")
         auctionsTable.querySelectorAll("a").forEach(function (auctionLink) {
-            auctionLink.href = auctionLink.href + "&favoured=0"
+            auctionLink.href += "&favoured=0"
+            if (window.localStorage.getItem("spacing")) {
+                auctionLink.href += "&spacing=" + JSON.parse(window.localStorage.getItem("spacing")).spacing
+            }
             auctionLink.setAttribute("onclick", "return handleLoadLotsLink(this)")
         })
 
@@ -285,6 +288,7 @@ function handleLoadAuctionsLink(element) {
 
 function handleLoadLotsSpacingLink(element, spacing) {
     window.history.pushState({page: "lots", scope: getUrlParameter("favoured") === "1" ? "all" : "favoured", spacing: spacing }, "Lots", getUrlWithParameter(window.location.href, "spacing", spacing))
+    window.localStorage.setItem("spacing", JSON.stringify({ spacing: spacing }))
     cancelAllRequests()
     loadLots()
     return false
